@@ -37,13 +37,14 @@ async function run() {
             const price = req.query?.price?.split(',')
             const sizes = req.query?.size?.split(',')
             const brand = req.query?.brand
-            let b = brand ? { $eq: 'Nike' } : { $ne: '' }
+            let b = brand ? { $eq: brand } : { $ne: '' }
             let s = sizes[0] === '' ? ['s', 'm', 'l', 'xl'] : sizes
             const query = {
                 sizes: { $in: s },
                 price: { $gt: parseInt(price[0]), $lt: parseInt(price[1]) },
                 Brand: b
             }
+            console.log('api hitted');
             const options = {}
             const cursor = products.find(query, options);
             const result = await cursor.toArray()
@@ -61,8 +62,10 @@ async function run() {
             image3 = imageToBase64(files?.image3)
             product.moreImage = [image1, image2, image3]
             product.isBase64 = true
+            product.price = Number(product.price)
             product.sizes = ["l", "xl"]
-            product.brand = 'Nike'
+            product.Brand = 'Nike'
+            console.log(product);
             const result = await products.insertOne(product)
             res.json(result)
         })

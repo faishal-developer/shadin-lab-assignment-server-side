@@ -28,7 +28,7 @@ async function run() {
         await client.connect();
         console.log('after');
 
-        const database = client.db('shadin-lab');
+        const database = client.db('shadin');
         const products = database.collection('products');
 
         app.get("/products", async (req, res) => {
@@ -36,15 +36,17 @@ async function run() {
             const page = parseInt(req.query?.page) || 1
             const price = req.query?.price?.split(',')
             const sizes = req.query?.size?.split(',')
-            const brand = req.query?.brand
-            let b = brand ? { $eq: brand } : { $ne: '' }
-            let s = sizes[0] === '' ? ['s', 'm', 'l', 'xl'] : sizes
-            const query = {
-                sizes: { $in: s },
-                price: { $gt: parseInt(price[0]), $lt: parseInt(price[1]) },
-                Brand: b
-            }
-            console.log('api hitted');
+            const query = {}
+            let brand = req.query?.brand
+            let b = brand !== '' && (query.Brand = { $in: brand?.split(',') })
+            let s = sizes[0] !== '' ? (query.sizes = { $in: sizes }) : (query.sizes = { $in: ['s', 'l'] })
+            query.price = { $gt: parseInt(price[0]), $lt: parseInt(price[1]) };
+            // const query = {
+            //     sizes: { $in: s },
+            //     price: { $gt: parseInt(price[0]), $lt: parseInt(price[1]) },
+            //     Brand: b
+            // }
+            console.log(query);
             const options = {}
             const cursor = products.find(query, options);
             const result = await cursor.toArray()

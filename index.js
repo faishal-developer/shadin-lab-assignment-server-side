@@ -26,7 +26,6 @@ const client = new MongoClient(uri);
 async function run() {
     try {
         await client.connect();
-        console.log('after');
 
         const database = client.db('shadin');
         const products = database.collection('products');
@@ -46,7 +45,6 @@ async function run() {
             //     price: { $gt: parseInt(price[0]), $lt: parseInt(price[1]) },
             //     Brand: b
             // }
-            console.log(query);
             const options = {}
             const cursor = products.find(query, options);
             const result = await cursor.toArray()
@@ -57,17 +55,14 @@ async function run() {
         app.post("/products", async (req, res) => {
             const files = req.files
             const product = req.body
-            console.log(files?.image);
             product.image = imageToBase64(files?.image)
             image1 = imageToBase64(files?.image1)
             image2 = imageToBase64(files?.image2)
-            image3 = imageToBase64(files?.image3)
-            product.moreImage = [image1, image2, image3]
+            product.moreImage = [image, image1, image2]
             product.isBase64 = true
             product.price = Number(product.price)
             product.sizes = ["l", "xl"]
             product.Brand = 'Nike'
-            console.log(product);
             const result = await products.insertOne(product)
             res.json(result)
         })
